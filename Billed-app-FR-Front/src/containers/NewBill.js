@@ -15,15 +15,41 @@ export default class NewBill {
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
-  handleChangeFile = e => {
-    e.preventDefault()
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
-    const formData = new FormData()
-    const email = JSON.parse(localStorage.getItem("user")).email
-    formData.append('file', file)
-    formData.append('email', email)
+
+  handleChangeFile = (e) => {
+    e.preventDefault();
+    const fileInput = this.document.querySelector(`input[data-testid="file"]`);
+
+    if (!fileInput || !fileInput.files.length) {
+      const error = new Error('No file selected');
+      console.error(error);
+      return;
+    }
+
+    const file = fileInput.files[0];
+
+    // Safeguard to ensure file.name exists before using split
+    const filePath = e.target.value ? e.target.value.split(/\\/g) : [];
+    const fileName = filePath.length > 0 ? filePath[filePath.length - 1] : '';
+
+    // Validation of file format
+    const validExtensions = ['jpg', 'jpeg', 'png'];
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+
+    // Validation of MIME type
+    const validMimeTypes = ['image/jpeg', 'image/png'];
+    const fileMimeType = file.type;
+
+    if ( !validExtensions.includes(fileExtension) || !validMimeTypes.includes(fileMimeType) ) {
+      alert('Veuillez sélectionner un fichier au format jpg, jpeg ou png.');
+      e.target.value = ''; // Reset the input field
+      return;
+    }
+
+    const formData = new FormData();
+    const email = JSON.parse(localStorage.getItem('user')).email;
+    formData.append('file', file);
+    formData.append('email', email);
 
     this.store
       .bills()
@@ -33,13 +59,14 @@ export default class NewBill {
           noContentType: true
         }
       })
-      .then(({fileUrl, key}) => {
+      .then(({ fileUrl, key }) => {
         console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
