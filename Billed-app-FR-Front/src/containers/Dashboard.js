@@ -131,27 +131,31 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0
-    if (this.index === undefined || this.index !== index) this.index = index
-    if (this.counter % 2 === 0) {
-      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
-      $(`#status-bills-container${this.index}`)
-        .html(cards(filteredBills(bills, getStatus(this.index))))
-      this.counter ++
+    // Use a state specific to each list
+    if (!this.openLists) this.openLists = {};
+
+    // Check if the list is already open or not
+    const isOpen = this.openLists[index] || false;
+
+    // Toggle the open state for the list in question
+    this.openLists[index] = !isOpen;
+
+    if (!isOpen) {
+        $(`#arrow-icon${index}`).css({transform: 'rotate(0deg)'});
+        $(`#status-bills-container${index}`).html(cards(filteredBills(bills, getStatus(index))));
     } else {
-      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
-      $(`#status-bills-container${this.index}`)
-        .html("")
-      this.counter ++
+        $(`#arrow-icon${index}`).css({transform: 'rotate(90deg)'});
+        $(`#status-bills-container${index}`).html('');
     }
 
-    bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
-    })
+    // Add click events for each displayed bill
+    bills.forEach((bill) => {
+        $(`#open-bill${bill.id}`).off('click'); // Delete any previous click event
+        $(`#open-bill${bill.id}`).on('click', (e) => this.handleEditTicket(e, bill, bills));
+    });
 
-    return bills
-
-  }
+    return bills;
+}
 
   getBillsAllUsers = () => {
     if (this.store) {
