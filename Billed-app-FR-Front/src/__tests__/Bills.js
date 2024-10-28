@@ -2,18 +2,18 @@
  * @jest-environment jsdom
  */
 
-import mockedStore from '../__mocks__/store'
-import {screen, waitFor} from "@testing-library/dom"
+import mockStore from '../__mocks__/store'
+import { screen, waitFor } from "@testing-library/dom"
 import "@testing-library/jest-dom"
 import userAction from "@testing-library/user-event"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import Bills from '../containers/Bills.js'
-import { ROUTES_PATH} from "../constants/routes.js"
-import {localStorageMock} from "../__mocks__/localStorage.js"
+import { ROUTES_PATH } from "../constants/routes.js"
+import { localStorageMock } from "../__mocks__/localStorage.js"
 import router from "../app/Router.js"
 
-jest.mock("../app/Store", () => mockedStore);
+jest.mock("../app/Store", () => mockStore);
 
 beforeEach(() => {
   Object.defineProperty(window, "localStorage", { value: localStorageMock });
@@ -52,8 +52,8 @@ describe("Given I am connected as an employee", () => {
       const billsInstance = new Bills({
         document,
         onNavigate,
-        store: null,
-        localStorage: window.localStorage,
+        store: mockStore,
+        localStorage: localStorageMock,
       })
 
       await waitFor(() => screen.getByTestId("btn-new-bill"))
@@ -81,8 +81,8 @@ describe("Given I am connected as an employee", () => {
       const billsInstance = new Bills({
         document,
         onNavigate,
+        store: mockStore,
         localStorage: localStorageMock,
-        store: null,
       })
 
       const iconEyes = screen.getAllByTestId('icon-eye')
@@ -97,11 +97,11 @@ describe("Given I am connected as an employee", () => {
         iconEye.addEventListener('click', () =>
           handleClickIconEye(iconEye),
         );
-        userAction.click(iconEye);
+        userAction.click(iconEye)
 
         expect(handleClickIconEye).toHaveBeenCalled()
 
-        expect(modale).toHaveClass('show');
+        expect(modale).toHaveClass('show')
       })
     })
   })
@@ -112,18 +112,18 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills", () => {
     beforeEach(() => {
-      jest.spyOn(mockedStore, "bills")
+      jest.spyOn(mockStore, "bills")
     })
 
     test("fetches bills from mock API GET", async () => {
       window.onNavigate(ROUTES_PATH.Bills)
-      const bills = await mockedStore.bills().list()
+      const bills = await mockStore.bills().list()
       expect(await waitFor(() => screen.getByTestId("tbody"))).toBeTruthy()
       expect(bills.length).toBe(4)
     })
 
     test("Then fetches bills from an API and fails with 404 message error", async () => {
-      mockedStore.bills.mockImplementationOnce(() => {
+      mockStore.bills.mockImplementationOnce(() => {
         return {
           list: () => {
             return Promise.reject(new Error("Erreur 404"))
@@ -137,7 +137,7 @@ describe("Given I am a user connected as Employee", () => {
     })
 
     test("Then fetches messages from an API and fails with 500 message error", async () => {
-      mockedStore.bills.mockImplementationOnce(() => {
+      mockStore.bills.mockImplementationOnce(() => {
         return {
           list: () => {
             return Promise.reject(new Error("Erreur 500"))
