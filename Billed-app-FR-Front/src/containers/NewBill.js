@@ -17,39 +17,37 @@ export default class NewBill {
   }
 
   handleChangeFile = (e) => {
-    e.preventDefault();
-    const fileInput = this.document.querySelector(`input[data-testid="file"]`);
+    e.preventDefault()
+    const fileInput = this.document.querySelector(`input[data-testid="file"]`)
 
     if (!fileInput || !fileInput.files.length) {
-      const error = new Error('No file selected');
-      console.error(error);
-      return;
+      const error = new Error('No file selected')
+      console.error(error)
+      return
     }
 
-    const file = fileInput.files[0];
+    const file = fileInput.files[0]
 
-    // Safeguard to ensure file.name exists before using split
-    const filePath = e.target.value ? e.target.value.split(/\\/g) : [];
-    const fileName = filePath.length > 0 ? filePath[filePath.length - 1] : '';
+    const fileName = file.name
 
     // Validation of file format
-    const validExtensions = ['jpg', 'jpeg', 'png'];
-    const fileExtension = fileName.split('.').pop().toLowerCase();
+    const validExtensions = ['jpg', 'jpeg', 'png']
+    const fileExtension = fileName.split('.').pop().toLowerCase()
 
     // Validation of MIME type
-    const validMimeTypes = ['image/jpeg', 'image/png'];
-    const fileMimeType = file.type;
+    const validMimeTypes = ['image/jpeg', 'image/png']
+    const fileMimeType = file.type
 
     if ( !validExtensions.includes(fileExtension) || !validMimeTypes.includes(fileMimeType) ) {
-      alert('Veuillez sélectionner un fichier au format jpg, jpeg ou png.');
-      e.target.value = ''; // Reset the input field
-      return;
+      alert('Veuillez sélectionner un fichier au format jpg, jpeg ou png.')
+      fileInput.value = '' // Reset the input field
+      return
     }
 
-    const formData = new FormData();
-    const email = JSON.parse(localStorage.getItem('user')).email;
-    formData.append('file', file);
-    formData.append('email', email);
+    const formData = new FormData()
+    const email = JSON.parse(localStorage.getItem('user')).email
+    formData.append('file', file)
+    formData.append('email', email)
 
     this.store
       .bills()

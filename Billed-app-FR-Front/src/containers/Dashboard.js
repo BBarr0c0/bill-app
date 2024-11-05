@@ -132,29 +132,30 @@ export default class {
 
   handleShowTickets(e, bills, index) {
     // Use a state specific to each list
-    if (!this.openLists) this.openLists = {};
+    if (!this.openLists) this.openLists = {}
 
     // Check if the list is already open or not
-    const isOpen = this.openLists[index] || false;
+    let isOpen = this.openLists[index] || false
 
     // Toggle the open state for the list in question
-    this.openLists[index] = !isOpen;
+    this.openLists[index] = !isOpen
+    isOpen = this.openLists[index]
 
-    if (!isOpen) {
-        $(`#arrow-icon${index}`).css({transform: 'rotate(0deg)'});
-        $(`#status-bills-container${index}`).html(cards(filteredBills(bills, getStatus(index))));
+    if (isOpen) {
+        $(`#arrow-icon${index}`).css({transform: 'rotate(0deg)'})
+        $(`#status-bills-container${index}`).html(cards(filteredBills(bills, getStatus(index))))
     } else {
-        $(`#arrow-icon${index}`).css({transform: 'rotate(90deg)'});
-        $(`#status-bills-container${index}`).html('');
+        $(`#arrow-icon${index}`).css({transform: 'rotate(90deg)'})
+        $(`#status-bills-container${index}`).html('')
     }
 
     // Add click events for each displayed bill
     bills.forEach((bill) => {
-        $(`#open-bill${bill.id}`).off('click'); // Delete any previous click event
-        $(`#open-bill${bill.id}`).on('click', (e) => this.handleEditTicket(e, bill, bills));
+        $(`#open-bill${bill.id}`).off('click') // Delete any previous click event
+        $(`#open-bill${bill.id}`).on('click', (e) => this.handleEditTicket(e, bill, bills))
     });
 
-    return bills;
+    return bills
 }
 
   getBillsAllUsers = () => {
